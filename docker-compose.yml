@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  spring-app:
+    container_name: spring-app
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/scipitor
+      SPRING_DATASOURCE_USERNAME: scipitor
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_MONGODB_URI: mongodb://mongo-db:27017/scipitor
+    depends_on:
+      - postgres-db
+      - mongo-db
+
+  postgres-db:
+    image: postgres:latest
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_DB: scipitor
+      POSTGRES_USER: scipitor
+      POSTGRES_PASSWORD: password
+    ports:
+      - "50432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  mongo-db:
+    image: mongo:latest
+    container_name: mongo-db
+    restart: always
+    ports:
+      - "20017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: scipitor
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  postgres-data:
+  mongo-data:
+
+networks:
+  default:
+    driver: bridge
